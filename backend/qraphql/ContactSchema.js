@@ -1,5 +1,4 @@
 var { buildSchema } = require('graphql');
-const { where } = require('sequelize');
 var ContactModel = require('../models');
 
 var schema = buildSchema(`
