@@ -1,17 +1,11 @@
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
-// import { updateUser } from '../actions/users';
-import { useDispatch } from 'react-redux';
-import {
-    updateUserAsync
-} from '../features/user/userSlice';
 
 export default function PhonebookItem(props) {
-    const dispatch = useDispatch()
+    console.log(props.constacts, 'props')
     const [user, setUser] = useState({
-        name: props.user.name,
-        phone: props.user.phone,
+        name: props.constacts.name,
+        phone: props.constacts.phone,
+        sent: true
     });
 
     const [status, setStatus] = useState({
@@ -36,8 +30,8 @@ export default function PhonebookItem(props) {
 
     const handleCencel = () => {
         setUser({
-            name: props.user.name,
-            phone: props.user.phone,
+            name: props.contacts.name,
+            phone: props.contacts.phone,
         })
         setStatus({
             isEdit: false
@@ -45,7 +39,7 @@ export default function PhonebookItem(props) {
     }
 
     const saveEdit = () => {
-        dispatch(updateUserAsync({ id: props.user.id, name: user.name, phone: user.phone }))
+        // ({ id: props.user.id, name: user.name, phone: user.phone })
         setStatus({ isEdit: false })
     }
 
@@ -67,7 +61,7 @@ export default function PhonebookItem(props) {
                 }
             </td>
             {
-                props.user.sent ?
+                user.sent ?
                     status.isEdit ?
                         <td>
                             <div className="row">

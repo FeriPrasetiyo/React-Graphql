@@ -1,23 +1,19 @@
-// import React, { useEffect } from 'react';
-// import { useSelector, useDispatch } from 'react-redux'
-// import PhonebookItem from "../../components/PhonebookItem"
-
-// import {
-//     loadUserAsync,
-//     selectUser,
-//     removeUserAsync,
-//     addUserAsync,
-//     loadmore
-// } from './userSlice';
+import PhonebookItem from "./PhonebookItem"
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_CONTACTS, DELETE_CONTACT } from "./grapqhl/gql";
+import { Loading, Alert } from "./Util";
 
 export default function PhonebookList() {
 
-    // const users = useSelector(selectUser)
-    // const dispatch = useDispatch()
+    const { loading, error, data } = useQuery(GET_CONTACTS);
+    
 
-    // useEffect(() => {
-    //     dispatch(loadUserAsync())
-    // }, [dispatch])
+    if (loading) return (
+        <Loading />
+    );
+    if (error) return (
+        <Alert messege={error} />
+    )
 
     const scrolling = (event) => {
         var element = event.target;
@@ -37,15 +33,13 @@ export default function PhonebookList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* {users.map((user, index) => (
+                    {data.getContacts.map((item, index) => (
                         <PhonebookItem
-                            key={user.id + 1}
+                            constacts={item}
+                            key={item.id + 1}
                             no={index + 1}
-                            user={user}
-                            remove={() => dispatch(removeUserAsync(user.id))}
-                            resend={() => dispatch(addUserAsync({ id: user.id, name: user.name, phone: user.phone }))}
                         />
-                    ))} */}
+                    ))}
                 </tbody>
             </table>
         </div>

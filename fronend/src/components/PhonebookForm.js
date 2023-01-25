@@ -1,38 +1,33 @@
-// import { useDispatch } from 'react-redux'
-import { useCallback, useState } from "react";
+import { useMutation } from "@apollo/client";
+import { useState } from "react";
+import { GET_CONTACTS, CREATE_CONTACT } from "./grapqhl/gql";
+import { Loading, Alert } from "./Util";
 
 export default function PhonebookForm(props) {
-    // const dispatch = useDispatch()
-    const [user, setUser] = useState({
-        name: '',
-        phone: ''
+    const [createContact, { loading, error }] = useMutation(CREATE_CONTACT, {
+        refetchQueries: [
+            { query: GET_CONTACTS }
+        ],
     });
 
-    const handleInputChange = (event) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-        setUser({
-            ...user,
-            [name]: value
-        });
-    }
+    const [contact, setContact] = useState({
+        name: '',
+        phone: '',
+    })
 
-    const handleSubmit = useCallback((event) => {
-        event.preventDefault()
-        ((user.name, user.phone))
-        setUser({ name: '', phone: '' })
-    }, [, user])
-
-    // const handleCencel = () => {
-    //     if (!props.h6label) {
-    //         props.cencel()
-    //     }
-    //     setUser({ name: '', phone: '' })
-    // }
+    if (loading) return (
+        <Loading />
+    );
+    if (error) return (
+        <Alert messege={error} />
+    )
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={e => {
+            e.preventDefault();
+            createContact({ variables: contact });
+            setContact({ name: '', phone: '' })
+        }}>
             <div className="row">
                 <div className="col-sm-12">
                     <div className="card">
@@ -45,7 +40,12 @@ export default function PhonebookForm(props) {
                                     <div className="mb-3 row">
                                         <label htlmfor="name" className="col-sm-2 col-form-label">Name</label>
                                         <div className="col-sm-10">
-                                            <input type="text" className="form-control" name='name' onChange={handleInputChange} value={user.name} />
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name='name'
+                                                onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                                                value={contact.name} />
                                         </div>
                                     </div>
                                 </div>
@@ -53,22 +53,25 @@ export default function PhonebookForm(props) {
                                     <div className="mb-3 row">
                                         <label htlmfor="phone" className="col-sm-2 col-form-label">Phone</label>
                                         <div className="col-sm-10">
-                                            <input type="number" className="form-control" name='phone' onChange={handleInputChange} value={user.phone} />
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                name='phone'
+                                                onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                                                value={contact.phone} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-1'>
                                     <div className="mb-3 row">
                                         <button type="submit" className="btn btn-success">
-                                            {/* <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon> */}
-                                            <span>{props.submitLabel || 'Save'}</span>
+                                            <span>Save</span>
                                         </button>
                                     </div>
                                 </div>
                                 <div className='col-1'>
                                     <div className="mb-3 row">
                                         <button type="button" onClick={props.cencelAdd} className="btn btn-warning">
-                                            {/* <FontAwesomeIcon icon={faBan}></FontAwesomeIcon> */}
                                             <span>Cencel</span>
                                         </button>
                                     </div>

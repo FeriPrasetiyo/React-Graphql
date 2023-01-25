@@ -1,12 +1,6 @@
 import { useCallback, useState } from "react";
-// import { useDispatch } from 'react-redux'
-
-// import {
-//     searchUser
-// } from './userSlice';
 
 export default function PhonebookForm(props) {
-    // const dispatch = useDispatch()
     const [user, setUser] = useState({
         name: '',
         phone: ''
@@ -26,7 +20,7 @@ export default function PhonebookForm(props) {
         event.preventDefault()
         (({ name: user.name, phone: user.phone }))
         setUser({ name: '', phone: '' })
-    }, [, user])
+    }, [user])
 
     const handleCencel = () => {
         setUser({ name: '', phone: '' })
