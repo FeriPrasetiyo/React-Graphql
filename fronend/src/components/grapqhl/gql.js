@@ -23,7 +23,6 @@ mutation createContact($name:String!,$phone:String!) {
 export const DELETE_CONTACT = gql`
 mutation deleteContact($id: ID!) {
     deleteContact(id: $id) {
-      id
       name
       phone
     }

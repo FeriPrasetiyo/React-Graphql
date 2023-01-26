@@ -5,13 +5,18 @@ import { Loading, Alert } from "./Util";
 
 export default function PhonebookList() {
 
-    const { loading, error, data } = useQuery(GET_CONTACTS);
-    
+    const { loading: loadingData, error: errorData, data: list } = useQuery(GET_CONTACTS);
 
-    if (loading) return (
+    const [deleteContact, { loading, error }] = useMutation(DELETE_CONTACT, {
+        refetchQueries: [
+            { query: GET_CONTACTS }
+        ],
+    });
+
+    if (loading || loadingData) return (
         <Loading />
     );
-    if (error) return (
+    if (error || errorData) return (
         <Alert messege={error} />
     )
 
@@ -33,11 +38,12 @@ export default function PhonebookList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.getContacts.map((item, index) => (
+                    {list.getContacts.map((item, index) => (
                         <PhonebookItem
                             constacts={item}
                             key={item.id + 1}
                             no={index + 1}
+                            remove={() => deleteContact({ variables: { id: item.id } })}
                         />
                     ))}
                 </tbody>

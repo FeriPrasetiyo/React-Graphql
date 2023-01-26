@@ -1,10 +1,9 @@
 import { useState } from 'react'
 
-export default function PhonebookItem(props) {
-    console.log(props.constacts, 'props')
+export default function PhonebookItem({ constacts, no, remove }) {
     const [user, setUser] = useState({
-        name: props.constacts.name,
-        phone: props.constacts.phone,
+        name: constacts.name,
+        phone: constacts.phone,
         sent: true
     });
 
@@ -30,8 +29,8 @@ export default function PhonebookItem(props) {
 
     const handleCencel = () => {
         setUser({
-            name: props.contacts.name,
-            phone: props.contacts.phone,
+            name: constacts.name,
+            phone: constacts.phone,
         })
         setStatus({
             isEdit: false
@@ -39,13 +38,12 @@ export default function PhonebookItem(props) {
     }
 
     const saveEdit = () => {
-        // ({ id: props.user.id, name: user.name, phone: user.phone })
         setStatus({ isEdit: false })
     }
 
     return (
         <tr>
-            <td>{props.no}</td>
+            <td>{no}</td>
             <td>
                 {status.isEdit ?
                     <input className='form-control' type='text' name='name' value={user.name} placeholder='masukan name' onChange={handleInputChange} />
@@ -91,7 +89,7 @@ export default function PhonebookItem(props) {
                                 </div>
                                 <div className="col-sm-5">
                                     <button className="btn btn-danger" type="button"
-                                        onClick={props.remove}>
+                                        onClick={remove}>
                                         {/* <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon> */}
                                         <span>Delete</span>
                                     </button>
@@ -102,9 +100,7 @@ export default function PhonebookItem(props) {
                     <td>
                         <div className="row">
                             <div className="col">
-                                <button className="btn btn-warning" type="button"
-                                    onClick={props.resend}>
-                                    {/* <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon> */}
+                                <button className="btn btn-warning" type="button">
                                     <span>resend</span>
                                 </button>
                             </div>
