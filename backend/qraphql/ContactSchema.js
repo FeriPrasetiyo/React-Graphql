@@ -1,5 +1,6 @@
 var { buildSchema } = require('graphql');
 var ContactModel = require('../models');
+const { Op } = require("sequelize");
 
 var schema = buildSchema(`
   input ContactInput {
@@ -13,14 +14,31 @@ var schema = buildSchema(`
     phone: String
   }
 
+  type PARAMS {
+    rowCount: Int
+    totalCount: Int
+    page: Int
+    pages: Int
+    name: String
+    phone: String
+  }
+  
+  type RESPONSE_LOAD_DATA {
+    success: Boolean
+    data: DATA
+  }
+
+  type DATA {
+    params: PARAMS
+    contacts: [Contact]
+  }
+
   type Query {
-    getContacts:[Contact]
-    getContact(id: ID!):Contact
+    hello: String
+    load(page: Int! = 1, name: String, phone: String): RESPONSE_LOAD_DATA
   }
 
   type Mutation {
-    getContacts: [Contact]
-    getContact(id:ID!): Contact
     createContact(input: ContactInput): Contact
     updateContact(id: ID!, input: ContactInput): Contact
     deleteContact(id: ID!): Contact
@@ -37,14 +55,58 @@ class Contact {
 
 
 const root = {
-  getContacts: async () => {
+  hello: () => "hello world",
+  load: async ({ page, name, phone }, args, context, info) => {
+    console.log("🚀 ~ file: resolvers.js:8 ~ load: ~ page", page)
     try {
-      const contact = await ContactModel.User.findAll()
-      return contact
-    } catch (err) {
+      let params = {};
+      let op = mode === "or" ? Op.or : Op.and;
+
+      const limit = 5;
+      const offset = (page - 1) * limit;
+
+      if (name || phone) {
+        params[op] = {};
+      }
+
+      if (name) {
+        params[op]["name"] = {
+          [Op.iLike]: `%${name}%`,
+        };
+      }
+
+      if (phone) {
+        params[op]["phone"] = {
+          [Op.iLike]: `%${phone}%`,
+        };
+      }
+
+      const totalCount = await ContactModel.User.count();
+      const { count, rows } = await ContactModel.User.findAndCountAll({
+        where: params,
+        limit,
+        offset,
+        order: [["id", "DESC"]],
+      });
+
+      const pages = Math.ceil(count / limit);
+
+      return ({
+        params: {
+          rowCount: count,
+          totalCount,
+          page: Number(page),
+          pages,
+          name,
+          phone,
+        },
+        contacts: rows,
+      });
+    } catch (error) {
       console.log(err)
     }
   },
+
   createContact: async ({ input }) => {
     try {
       const contact = await ContactModel.User.create(input)
@@ -53,6 +115,7 @@ const root = {
       console.log(err)
     }
   },
+
   updateContact: async ({ id, input }) => {
     try {
       const contact = await ContactModel.User.update({ name: input.name, phone: input.phone }, {
@@ -67,6 +130,7 @@ const root = {
       console.log(err)
     }
   },
+
   deleteContact: async ({ id }) => {
     try {
       const contact = ContactModel.User.destroy({
@@ -80,23 +144,5 @@ const root = {
     }
   },
 };
-
-/*
-{
-  getTodos{
-    _id
-    title
-    complete
-  }
-}
-mutation {
-  createTodo(input: {
-    title: "kerja"
-  }) {
-    _id
-    title
-  }
-}
-*/
 
 module.exports = { schema, root }
