@@ -2,16 +2,20 @@ import PhonebookItem from "./PhonebookItem"
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_CONTACTS, DELETE_CONTACT } from "./grapqhl/gql";
 import { Loading, Alert } from "./Util";
+import { useContext, useState } from "react";
+import { ParamsContext } from "./Phonebookbox"
 
 export default function PhonebookList() {
-
-    const { loading: loadingData, error: errorData, data: list } = useQuery(GET_CONTACTS);
+    const [contacts, setContacts] = useState([])
+    const { params, setParams } = useContext(ParamsContext)
+    const { loading: loadingData, error: errorData, data: list } = useQuery(LOAD_CONTACTS);
 
     const [deleteContact, { loading, error }] = useMutation(DELETE_CONTACT, {
         refetchQueries: [
             { query: GET_CONTACTS }
         ],
     });
+
 
     if (loading || loadingData) return (
         <Loading />
@@ -26,6 +30,7 @@ export default function PhonebookList() {
             // (loadmore())
         }
     }
+
     return (
         <div className="col" onScroll={scrolling} style={{ overflowY: 'scroll', height: 200 }}>
             <table className="table">

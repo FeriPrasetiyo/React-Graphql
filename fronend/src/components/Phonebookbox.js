@@ -4,6 +4,10 @@ import Phonebookseach from './Phonebookseach'
 import { useState } from 'react'
 
 export default function Phonebook(props) {
+    const [params, setParams] = useState({
+        page: 1,
+        pages: 1,
+    })
     const [add, setAdd] = useState({
         isAdd: false
     });

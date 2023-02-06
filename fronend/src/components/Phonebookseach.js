@@ -1,30 +1,28 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { GET_CONTACTS, CREATE_CONTACT } from "./grapqhl/gql";
+import { Loading, Alert } from "./Util";
 
 export default function PhonebookForm(props) {
-    const [user, setUser] = useState({
-        name: '',
-        phone: ''
+    const [createContact, { loading, error }] = useMutation(CREATE_CONTACT, {
+        refetchQueries: [
+            { query: GET_CONTACTS }
+        ],
     });
 
-    const handleInputChange = (event) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-        setUser({
-            ...user,
-            [name]: value
-        });
-    }
+    const [contact, setContact] = useState({
+        name: '',
+        phone: '',
+    })
 
-    const handleSubmit = useCallback((event) => {
-        event.preventDefault()
-        (({ name: user.name, phone: user.phone }))
-        setUser({ name: '', phone: '' })
-    }, [user])
+    if (loading) return (
+        <Loading />
+    );
+    if (error) return (
+        <Alert messege={error} />
+    )
 
-    const handleCencel = () => {
-        setUser({ name: '', phone: '' })
-    }
+
 
     return (
         <form onSubmit={handleSubmit}>

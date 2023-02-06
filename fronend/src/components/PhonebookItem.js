@@ -1,111 +1,121 @@
 import { useState } from 'react'
+import { useMutation } from "@apollo/client";
+import { GET_CONTACTS, UPDATE_CONTACT } from "./grapqhl/gql";
+import { Loading, Alert } from "./Util";
 
-export default function PhonebookItem({ constacts, no, remove }) {
-    const [user, setUser] = useState({
-        name: constacts.name,
-        phone: constacts.phone,
-        sent: true
+export default function PhonebookItem(props) {
+    const [contact, setContact] = useState({
+        id: props.constacts.id,
+        name: props.constacts.name,
+        phone: props.constacts.phone,
+    })
+    const [edit, setEdit] = useState(false)
+
+    const [updateContact, { loading, error }] = useMutation(UPDATE_CONTACT, {
+        refetchQueries: [{ query: GET_CONTACTS }],
+        onCompleted: () => {
+            setEdit(false)
+        }
     });
 
-    const [status, setStatus] = useState({
-        isEdit: false
-    });
+    if (loading) return (
+        <Loading />
+    );
+    if (error) return (
+        <Alert messege={error} />
+    )
 
     const handleInputChange = (event) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-        setUser({
-            ...user,
+        console.log(event)
+        const { name, value } = event.target;
+        setContact({
+            ...contact,
             [name]: value,
         });
-    }
+    };
 
     const handleEdit = () => {
-        setStatus({
+        setEdit({
             isEdit: true
         })
     }
 
     const handleCencel = () => {
-        setUser({
-            name: constacts.name,
-            phone: constacts.phone,
+        setContact({
+            name: props.constacts.name,
+            phone: props.constacts.phone,
         })
-        setStatus({
-            isEdit: false
-        })
+        setEdit(false)
     }
 
-    const saveEdit = () => {
-        setStatus({ isEdit: false })
-    }
+    const handleUpdateContact = () => {
+        console.log(contact.id)
+        const data = {
+            id: contact.id,
+            name: contact.name,
+            phone: contact.phone,
+        };
+        updateContact({ variables: data });
+    };
 
     return (
         <tr>
-            <td>{no}</td>
+            <td>{props.no}</td>
             <td>
-                {status.isEdit ?
-                    <input className='form-control' type='text' name='name' value={user.name} placeholder='masukan name' onChange={handleInputChange} />
+                {edit ?
+                    <input className='form-control'
+                        type='text' name='name'
+                        value={contact.name}
+                        placeholder='masukan name'
+                        onChange={handleInputChange} />
                     :
-                    user.name
+                    contact.name
                 }
             </td>
             <td>
-                {status.isEdit ?
-                    <input className='form-control' type='number' name='phone' value={user.phone} placeholder='masukan name' onChange={handleInputChange} />
+                {edit ?
+                    <input className='form-control'
+                        type='number'
+                        name='phone'
+                        value={contact.phone}
+                        placeholder='masukan phone'
+                        onChange={handleInputChange} />
                     :
-                    user.phone
+                    contact.phone
                 }
             </td>
-            {
-                user.sent ?
-                    status.isEdit ?
-                        <td>
-                            <div className="row">
-                                <div className="col-sm-5">
-                                    <button type="button" className="btn btn-info" onClick={saveEdit}>
-                                        {/* <FontAwesomeIcon icon={faPencil}></FontAwesomeIcon> */}
-                                        <span>Save</span>
-                                    </button>
-                                </div>
-                                <div className="col-sm-6">
-                                    <button className="btn btn-warning" type="button"
-                                        onClick={handleCencel}>
-                                        {/* <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon> */}
-                                        <span>Cencel</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                        :
-                        <td>
-                            <div className="row">
-                                <div className="col-sm-4">
-                                    <button type="button" className="btn btn-success" onClick={handleEdit}>
-                                        {/* <FontAwesomeIcon icon={faPencil}></FontAwesomeIcon> */}
-                                        <span>Edit</span>
-                                    </button>
-                                </div>
-                                <div className="col-sm-5">
-                                    <button className="btn btn-danger" type="button"
-                                        onClick={remove}>
-                                        {/* <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon> */}
-                                        <span>Delete</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    :
-                    <td>
-                        <div className="row">
-                            <div className="col">
-                                <button className="btn btn-warning" type="button">
-                                    <span>resend</span>
-                                </button>
-                            </div>
+            {edit ?
+                <td>
+                    <div className="row">
+                        <div className="col-sm-5">
+                            <button type="button" className="btn btn-info" onClick={handleUpdateContact}>
+                                <span>Save</span>
+                            </button>
                         </div>
-                    </td>
+                        <div className="col-sm-6">
+                            <button className="btn btn-warning" type="button"
+                                onClick={handleCencel}>
+                                <span>Cencel</span>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+                :
+                <td>
+                    <div className="row">
+                        <div className="col-sm-4">
+                            <button type="button" className="btn btn-success" onClick={handleEdit}>
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                        <div className="col-sm-5">
+                            <button className="btn btn-danger" type="button"
+                                onClick={props.remove}>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </td>
             }
         </tr >
     )
