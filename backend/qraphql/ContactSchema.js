@@ -55,9 +55,7 @@ class Contact {
 
 
 const root = {
-  hello: () => "hello world",
   load: async ({ page, name, phone }, args, context, info) => {
-    console.log("🚀 ~ file: resolvers.js:8 ~ load: ~ page", page)
     try {
       let params = {};
       let op = mode === "or" ? Op.or : Op.and;

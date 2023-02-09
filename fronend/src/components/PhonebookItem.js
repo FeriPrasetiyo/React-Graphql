@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation } from "@apollo/client";
-import { GET_CONTACTS, UPDATE_CONTACT } from "./grapqhl/gql";
+import { LOAD_CONTACTS, UPDATE_CONTACT, DELETE_CONTACT } from "./grapqhl/gql";
 import { Loading, Alert } from "./Util";
 
 export default function PhonebookItem(props) {
@@ -12,18 +12,17 @@ export default function PhonebookItem(props) {
     const [edit, setEdit] = useState(false)
 
     const [updateContact, { loading, error }] = useMutation(UPDATE_CONTACT, {
-        refetchQueries: [{ query: GET_CONTACTS }],
+        refetchQueries: [{ query: LOAD_CONTACTS }],
         onCompleted: () => {
             setEdit(false)
         }
     });
 
-    if (loading) return (
-        <Loading />
-    );
-    if (error) return (
-        <Alert messege={error} />
-    )
+    const [deleteContact, { loading: loadingDelete, error: errorDelete }] = useMutation(DELETE_CONTACT, {
+        refetchQueries: [
+            { query: LOAD_CONTACTS }
+        ],
+    });
 
     const handleInputChange = (event) => {
         console.log(event)
@@ -57,6 +56,13 @@ export default function PhonebookItem(props) {
         };
         updateContact({ variables: data });
     };
+
+    if (loading || loadingDelete) return (
+        <Loading />
+    );
+    if (error || errorDelete) return (
+        <Alert messege={error} />
+    )
 
     return (
         <tr>

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_CONTACTS, CREATE_CONTACT } from "./grapqhl/gql";
+import { CREATE_CONTACT, LOAD_CONTACTS } from "./grapqhl/gql";
 import { Loading, Alert } from "./Util";
 
 export default function PhonebookForm(props) {
     const [createContact, { loading, error }] = useMutation(CREATE_CONTACT, {
         refetchQueries: [
-            { query: GET_CONTACTS }
+            { query: LOAD_CONTACTS }
         ],
     });
 
@@ -53,7 +53,6 @@ export default function PhonebookForm(props) {
                                 <div className='col-1'>
                                     <div className="mb-3 row">
                                         <button type="submit" className="btn btn-primary">
-                                            {/* <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon> */}
                                             <span>Search</span>
                                         </button>
                                     </div>
@@ -61,7 +60,6 @@ export default function PhonebookForm(props) {
                                 <div className='col-1'>
                                     <div className="mb-3 row">
                                         <button type="button" onClick={handleCencel} className="btn btn-warning">
-                                            {/* <FontAwesomeIcon icon={faBan}></FontAwesomeIcon> */}
                                             <span>Cencel</span>
                                         </button>
                                     </div>

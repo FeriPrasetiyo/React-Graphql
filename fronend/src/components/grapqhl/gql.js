@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export const GET_CONTACTS = gql`
+export const LOAD_CONTACTS = gql`
 query loadContact(
   $page: Int! = 1
   $name: String
@@ -22,6 +22,7 @@ query loadContact(
           phone
         }
       }
+      success
     }
   }
 `;

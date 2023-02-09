@@ -1,6 +1,6 @@
 import PhonebookItem from "./PhonebookItem"
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_CONTACTS, DELETE_CONTACT } from "./grapqhl/gql";
+import { useQuery } from '@apollo/client';
+import { LOAD_CONTACTS } from "./grapqhl/gql";
 import { Loading, Alert } from "./Util";
 import { useContext, useState } from "react";
 import { ParamsContext } from "./Phonebookbox"
@@ -8,28 +8,46 @@ import { ParamsContext } from "./Phonebookbox"
 export default function PhonebookList() {
     const [contacts, setContacts] = useState([])
     const { params, setParams } = useContext(ParamsContext)
-    const { loading: loadingData, error: errorData, data: list } = useQuery(LOAD_CONTACTS);
 
-    const [deleteContact, { loading, error }] = useMutation(DELETE_CONTACT, {
-        refetchQueries: [
-            { query: GET_CONTACTS }
-        ],
+    const { loading, error } = useQuery(LOAD_CONTACTS, {
+        variables: {
+            page: params.page,
+            name: params.name,
+            phone: params.phone,
+        },
+        notifyOnNetworkStatusChange: true,
+        onCompleted: ({ load: { data } }) => {
+            setParams({
+                page: data.params.page,
+                pages: data.params.pages,
+                name: data.params.name ? data.params.name : params.name,
+                phone: data.params.phone ? data.params.phone : params.phone,
+            });
+            console.log(data)
+            setContacts([...(params.page === 1 ? [] : contacts), ...data.contacts]);
+        },
     });
-
-
-    if (loading || loadingData) return (
-        <Loading />
-    );
-    if (error || errorData) return (
-        <Alert messege={error} />
-    )
+    console.log(contacts)
 
     const scrolling = (event) => {
-        var element = event.target;
-        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-            // (loadmore())
+        if (
+            event.target.scrollHeight - event.target.scrollTop ===
+            event.target.clientHeight
+        ) {
+            if (params.page < params.pages) {
+                setParams({
+                    ...params,
+                    page: params.page + 1,
+                });
+            }
         }
     }
+    if (loading) return (
+        <Loading />
+    );
+    if (error) return (
+        <Alert messege={error} />
+    )
 
     return (
         <div className="col" onScroll={scrolling} style={{ overflowY: 'scroll', height: 200 }}>
@@ -43,12 +61,11 @@ export default function PhonebookList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {list.getContacts.map((item, index) => (
+                    {contacts.map((item, index) => (
                         <PhonebookItem
                             constacts={item}
                             key={item.id + 1}
                             no={index + 1}
-                            remove={() => deleteContact({ variables: { id: item.id } })}
                         />
                     ))}
                 </tbody>
