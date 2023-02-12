@@ -1,4 +1,5 @@
 var { buildSchema } = require('graphql');
+var { Response } = require("../helpers/util");
 var ContactModel = require('../models');
 const { Op } = require("sequelize");
 
@@ -9,7 +10,7 @@ var schema = buildSchema(`
   }
 
   type Contact {
-    id: ID!
+    id: Int!
     name: String
     phone: String
   }
@@ -22,15 +23,15 @@ var schema = buildSchema(`
     name: String
     phone: String
   }
-  
-  type RESPONSE_LOAD_DATA {
-    success: Boolean
-    data: DATA
-  }
 
   type DATA {
     params: PARAMS
     contacts: [Contact]
+  }
+  
+  type RESPONSE_LOAD_DATA {
+    success: Boolean
+    data: DATA
   }
 
   type Query {
@@ -39,33 +40,29 @@ var schema = buildSchema(`
   }
 
   type Mutation {
-    createContact(input: ContactInput): Contact
-    updateContact(id: ID!, input: ContactInput): Contact
-    deleteContact(id: ID!): Contact
+    create(input: ContactInput): Contact
+    update(id: Int!, input: ContactInput): Contact
+    delete(id: Int!): Contact
   }
 `);
 
-class Contact {
-  constructor(id, { name, phone }) {
-    this.id = id;
-    this.name = name;
-    this.phone = phone
-  }
-}
+// class Contact {
+//   constructor(id, { name, phone }) {
+//     this.id = id;
+//     this.name = name;
+//     this.phone = phone
+//   }
+// }
 
 
 const root = {
   load: async ({ page, name, phone }, args, context, info) => {
     try {
       let params = {};
-      let op = mode === "or" ? Op.or : Op.and;
+      let op = {}
 
       const limit = 5;
       const offset = (page - 1) * limit;
-
-      if (name || phone) {
-        params[op] = {};
-      }
 
       if (name) {
         params[op]["name"] = {
@@ -78,6 +75,7 @@ const root = {
           [Op.iLike]: `%${phone}%`,
         };
       }
+      console.log(params)
 
       const totalCount = await ContactModel.User.count();
       const { count, rows } = await ContactModel.User.findAndCountAll({
@@ -88,8 +86,7 @@ const root = {
       });
 
       const pages = Math.ceil(count / limit);
-
-      return ({
+      return new Response({
         params: {
           rowCount: count,
           totalCount,
@@ -101,20 +98,20 @@ const root = {
         contacts: rows,
       });
     } catch (error) {
-      console.log(err)
+      return new Response(error, false)
     }
   },
 
-  createContact: async ({ input }) => {
+  create: async ({ input }) => {
     try {
       const contact = await ContactModel.User.create(input)
-      return contact
-    } catch {
-      console.log(err)
+      return new Response(contact);
+    } catch (error) {
+      return new Response(error, false)
     }
   },
 
-  updateContact: async ({ id, input }) => {
+  update: async ({ id, input }) => {
     try {
       const contact = await ContactModel.User.update({ name: input.name, phone: input.phone }, {
         where: {
@@ -123,22 +120,22 @@ const root = {
         returning: true,
         plain: true
       })
-      return contact[1]
+      return new Response(contact[1])
     } catch (err) {
-      console.log(err)
+      return new Response(err, false)
     }
   },
 
-  deleteContact: async ({ id }) => {
+  delete: async ({ id }) => {
     try {
       const contact = ContactModel.User.destroy({
         where: {
           id
         }
       })
-      return contact
-    } catch (err) {
-      throw err
+      return new Response(contact)
+    } catch (error) {
+      return new Response(error, false)
     }
   },
 };

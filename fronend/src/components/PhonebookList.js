@@ -13,7 +13,7 @@ export default function PhonebookList() {
         variables: {
             page: params.page,
             name: params.name,
-            phone: params.phone,
+            phone: params.phone
         },
         notifyOnNetworkStatusChange: true,
         onCompleted: ({ load: { data } }) => {
@@ -23,11 +23,10 @@ export default function PhonebookList() {
                 name: data.params.name ? data.params.name : params.name,
                 phone: data.params.phone ? data.params.phone : params.phone,
             });
-            console.log(data)
             setContacts([...(params.page === 1 ? [] : contacts), ...data.contacts]);
+            console.log(data, 'cek data<<<<');
         },
     });
-    console.log(contacts)
 
     const scrolling = (event) => {
         if (
@@ -50,7 +49,7 @@ export default function PhonebookList() {
     )
 
     return (
-        <div className="col" onScroll={scrolling} style={{ overflowY: 'scroll', height: 200 }}>
+        <div className="col" onScroll={scrolling} style={{ overflowY: 'scroll', height: 300 }}>
             <table className="table">
                 <thead>
                     <tr>

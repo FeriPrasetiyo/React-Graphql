@@ -1,5 +1,6 @@
 import PhonebookForm from './PhonebookForm'
 import PhonebookList from './PhonebookList'
+import Phonebookseach from './Phonebookseach'
 import { createContext, useState } from 'react'
 export const ParamsContext = createContext()
 
@@ -53,6 +54,7 @@ export default function Phonebook(props) {
                 </div>
                 <br></br>
                 <div className="row">
+                    <Phonebookseach />
                 </div >
                 <br></br>
                 <div className="row">

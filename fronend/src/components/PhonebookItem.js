@@ -25,7 +25,6 @@ export default function PhonebookItem(props) {
     });
 
     const handleInputChange = (event) => {
-        console.log(event)
         const { name, value } = event.target;
         setContact({
             ...contact,
@@ -48,7 +47,6 @@ export default function PhonebookItem(props) {
     }
 
     const handleUpdateContact = () => {
-        console.log(contact.id)
         const data = {
             id: contact.id,
             name: contact.name,
@@ -116,7 +114,7 @@ export default function PhonebookItem(props) {
                         </div>
                         <div className="col-sm-5">
                             <button className="btn btn-danger" type="button"
-                                onClick={props.remove}>
+                                onClick={() => deleteContact({ variables: { id: props.constacts.id } })}>
                                 <span>Delete</span>
                             </button>
                         </div>

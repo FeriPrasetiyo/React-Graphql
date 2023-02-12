@@ -29,8 +29,7 @@ query loadContact(
 
 export const CREATE_CONTACT = gql`
 mutation createContact($name:String!,$phone:String!) {
-    createContact(input: { name: $name, phone: $phone}) {
-      id
+    create(input: { name: $name, phone: $phone}) {
       name
       phone
     }
@@ -38,8 +37,8 @@ mutation createContact($name:String!,$phone:String!) {
 `;
 
 export const DELETE_CONTACT = gql`
-mutation deleteContact($id: ID!) {
-    deleteContact(id: $id) {
+mutation deleteContact($id: Int!) {
+    delete(id: $id) {
       name
       phone
     }
@@ -47,8 +46,8 @@ mutation deleteContact($id: ID!) {
 `;
 
 export const UPDATE_CONTACT = gql`
-mutation updateContact($id: ID!, $name: String ,$phone: String) {
-  updateContact(id: $id,input: { name: $name, phone: $phone}) {
+mutation updateContact($id: Int!, $name: String ,$phone: String) {
+  update(id: $id,input: { name: $name, phone: $phone}) {
       name
       phone
     }
