@@ -31,7 +31,6 @@ export default function PhonebookForm(props) {
 
     const handleOnSearchSubmit = (event) => {
         event.preventDefault();
-        console.log(contact.name, contact.phone)
         if (contact.name === "" && contact.phone === "") {
             return event.preventDefault();
         }

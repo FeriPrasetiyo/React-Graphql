@@ -8,6 +8,8 @@ export default function Phonebook(props) {
     const [params, setParams] = useState({
         page: 1,
         pages: 1,
+        name: '',
+        phone: ''
     })
 
     const [add, setAdd] = useState({

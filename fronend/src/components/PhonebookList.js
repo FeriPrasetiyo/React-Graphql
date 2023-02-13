@@ -24,7 +24,6 @@ export default function PhonebookList() {
                 phone: data.params.phone ? data.params.phone : params.phone,
             });
             setContacts([...(params.page === 1 ? [] : contacts), ...data.contacts]);
-            console.log(data, 'cek data<<<<');
         },
     });
 
