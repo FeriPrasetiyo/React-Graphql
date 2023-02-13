@@ -59,23 +59,21 @@ const root = {
   load: async ({ page, name, phone }, args, context, info) => {
     try {
       let params = {};
-      let op = {}
 
       const limit = 5;
       const offset = (page - 1) * limit;
 
       if (name) {
-        params[op]["name"] = {
+        params["name"] = {
           [Op.iLike]: `%${name}%`,
         };
       }
 
       if (phone) {
-        params[op]["phone"] = {
+        params["phone"] = {
           [Op.iLike]: `%${phone}%`,
         };
       }
-      console.log(params)
 
       const totalCount = await ContactModel.User.count();
       const { count, rows } = await ContactModel.User.findAndCountAll({
